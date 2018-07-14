@@ -31,7 +31,7 @@ import java.io.IOException;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ProfileActivity extends AppCompatActivity implements Imageutils.ImageAttachmentListener{
+public class ProfileActivity extends AppCompatActivity{
 
     private  FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     TextView profileName;
@@ -39,7 +39,6 @@ public class ProfileActivity extends AppCompatActivity implements Imageutils.Ima
     Imageutils imageutils;
     TextView logOut;
     CircleImageView profilePic;
-    CircleImageView iv_attachment;
     FirebaseStorage storage;
     StorageReference storageReference;
     private Uri filePath;
@@ -59,7 +58,6 @@ public class ProfileActivity extends AppCompatActivity implements Imageutils.Ima
         profileEmail = (TextView) findViewById(R.id.tvNumber3);
         logOut = (TextView) findViewById(R.id.tvNumber7);
         profilePic = (CircleImageView) findViewById(R.id.profile_image);
-        iv_attachment = (CircleImageView) findViewById(R.id.imageViewAttach);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         storageReference = FirebaseStorage.getInstance().getReference();
 
@@ -101,12 +99,7 @@ public class ProfileActivity extends AppCompatActivity implements Imageutils.Ima
                 finish();
             }
         });
-        iv_attachment.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                chooseImage();
-            }
-        });
+
 
 
     }
@@ -131,43 +124,6 @@ public class ProfileActivity extends AppCompatActivity implements Imageutils.Ima
         }
 
         return super.onOptionsItemSelected(item);
-    }
-    private void chooseImage() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
-    }
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
-                && data != null && data.getData() != null )
-        {
-            filePath = data.getData();
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
-                iv_attachment.setImageBitmap(bitmap);
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-        }
-    }
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        imageutils.request_permission_result(requestCode, permissions, grantResults);
-    }
-
-    @Override
-    public void image_attachment(int from, String filename, Bitmap file, Uri uri) {
-        this.bitmap = file;
-        this.file_name = filename;
-        iv_attachment.setImageBitmap(file);
-
-        String path = Environment.getExternalStorageDirectory() + File.separator + "ImageAttach" + File.separator;
-        imageutils.createImage(file, filename, path, false);
     }
     public void onBackPressed(){
         Intent intent = new Intent(ProfileActivity.this, BottomNavigation.class);

@@ -14,22 +14,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:padding="@dimen/activity_horizontal_margin">
-
-            <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/imageViewAttach"
-                android:layout_width="125dp"
-                android:layout_height="64dp"
-                android:contentDescription="Profile Pic"
-                android:src="@drawable/ph_add_image" />
-
-        </RelativeLayout>
-
 
         <RelativeLayout
             android:layout_width="match_parent"
