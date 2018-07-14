@@ -71,12 +71,6 @@ public class ProfileActivity extends AppCompatActivity{
             Log.e("Photo URL", "Null");
         }
 
-        storageReference.child("images/"+user.getUid()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                filePath = uri;
-            }
-        });
         //Log.e("Photo URL", filePath.toString());
         Picasso.get().load(user.getPhotoUrl()).into(profilePic);
 

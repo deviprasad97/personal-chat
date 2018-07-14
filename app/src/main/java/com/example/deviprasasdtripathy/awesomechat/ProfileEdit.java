@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -43,9 +45,11 @@ public class ProfileEdit extends AppCompatActivity implements Imageutils.ImageAt
     Imageutils imageutils;
 
     private Uri filePath;
+    private Uri profilePath;
     private Bitmap bitmap;
     private String file_name;
     FirebaseStorage storage;
+    private TextView photoUpload;
     StorageReference storageReference;
 
 
@@ -59,6 +63,7 @@ public class ProfileEdit extends AppCompatActivity implements Imageutils.ImageAt
         profileImage = (CircleImageView) findViewById(R.id.edit_profile_image);
         name = (AutoCompleteTextView) findViewById(R.id.editProfileName);
         update = (Button) findViewById(R.id.update);
+        photoUpload = (TextView) findViewById(R.id.profile_image_upload);
 
         Picasso.get().load(user.getPhotoUrl()).into(profileImage);
         name.setText(user.getDisplayName());
@@ -70,10 +75,15 @@ public class ProfileEdit extends AppCompatActivity implements Imageutils.ImageAt
                 chooseImage();
             }
         });
-        update.setOnClickListener(new View.OnClickListener() {
+        photoUpload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 uploadImage();
+            }
+        });
+        update.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 updateProfile(view);
             }
         });
@@ -81,31 +91,35 @@ public class ProfileEdit extends AppCompatActivity implements Imageutils.ImageAt
 
     }
     private void updateProfile(final View view){
-        final Uri[] url = new Uri[1];
-        storageReference.child("images/"+user.getUid()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+        StorageReference profileStorageRef = FirebaseStorage.getInstance().getReference();
+
+
+
+        profileStorageRef.child("images/"+user.getUid()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-                url[0] = uri;
+                profilePath = uri;
+                Log.e("profilePath", profilePath.toString());
+                UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                        .setDisplayName(name.getText().toString())
+                        .setPhotoUri(profilePath)
+                        .build();
+
+                user.updateProfile(profileUpdates)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Log.d("ProfileEdit", "User profile updated.");
+                                    Snackbar.make(view, "Profile Updated", Snackbar.LENGTH_LONG)
+                                            .setAction("Action", null).show();
+
+                                }
+                            }
+                        });
             }
         });
-        Log.e("Photo URL", url[0].toString());
-        UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                .setDisplayName(name.getText().toString())
-                .setPhotoUri(url[0])
-                .build();
 
-        user.updateProfile(profileUpdates)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Log.d("ProfileEdit", "User profile updated.");
-                            Snackbar.make(view, "Profile Updated", Snackbar.LENGTH_LONG)
-                                    .setAction("Action", null).show();
-
-                        }
-                    }
-                });
     }
 
     private void chooseImage() {
@@ -160,7 +174,6 @@ public class ProfileEdit extends AppCompatActivity implements Imageutils.ImageAt
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             progressDialog.dismiss();
-                            onBackPressed();
                             Toast.makeText(ProfileEdit.this, "Uploaded", Toast.LENGTH_SHORT).show();
                         }
                     })
@@ -180,7 +193,9 @@ public class ProfileEdit extends AppCompatActivity implements Imageutils.ImageAt
                         }
                     });
         }
+
     }
+
 
     public void onBackPressed(){
         Intent intent = new Intent(ProfileEdit.this, ProfileActivity.class);

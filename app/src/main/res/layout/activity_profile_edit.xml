@@ -1,17 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".ProfileEdit">
 
-    <ScrollView
+    <RelativeLayout
         android:id="@+id/login_form"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="44dp">
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/email_login_form"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -19,27 +23,40 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true">
 
                 <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/edit_profile_image"
-                    android:layout_width="48dp"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentStart="true"
+                    android:layout_width="107dp"
+                    android:layout_height="113dp"
                     android:layout_alignParentTop="true"
-                    android:layout_marginStart="12dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="35dp"
                     android:src="@mipmap/profile"
                     app:civ_border_color="#FF000000"
-                    app:civ_border_width="2dp"
-                    android:layout_alignParentLeft="true"
-                    android:layout_marginLeft="12dp" />
+                    app:civ_border_width="2dp" />
+
+                <TextView
+                    android:id="@+id/profile_image_upload"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="155dp"
+                    android:fontFamily="@font/nunito_bold"
+                    android:text="Upload"
+                    android:textColor="#3897F0"
+                    android:textSize="24sp" />
 
                 <AutoCompleteTextView
                     android:id="@+id/editProfileName"
-                    android:layout_width="317dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginTop="234dp"
                     android:background="@drawable/search_layout"
                     android:ems="10"
                     android:fontFamily="@font/nunito_semibold"
@@ -52,8 +69,7 @@
                     android:paddingTop="10dp"
                     android:singleLine="true"
                     android:textColor="#999999"
-                    android:textSize="16sp"
-                    android:layout_alignParentRight="true" />
+                    android:textSize="16sp" />
             </RelativeLayout>
 
 
@@ -62,10 +78,12 @@
                 style="?android:textAppearanceSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginBottom="219dp"
                 android:text="Update"
                 android:textStyle="bold" />
-        </LinearLayout>
-    </ScrollView>
+        </RelativeLayout>
+    </RelativeLayout>
 
-</android.support.design.widget.CoordinatorLayout>
+</RelativeLayout>
