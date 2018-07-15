@@ -6,6 +6,17 @@
     android:layout_height="match_parent"
     tools:context=".ChatActivity">
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/chat_view_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@android:color/background_light"
+        android:textColor="#555555"
+        android:fontFamily="@font/nunito_bold"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+
     <co.intentservice.chatui.ChatView
         android:id="@+id/chat_view"
         android:layout_width="match_parent"

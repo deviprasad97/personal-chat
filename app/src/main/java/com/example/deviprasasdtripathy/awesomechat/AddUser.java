@@ -158,6 +158,7 @@ public class AddUser extends AppCompatActivity {
 
                             Intent intent = new Intent(AddUser.this, ChatActivity.class);
                             intent.putExtra("threadID", snapshot.getRef().getKey());
+                            intent.putExtra("receiver_email", receiver_email);
                             startActivity(intent);
                             finish();
                             break;
@@ -173,6 +174,7 @@ public class AddUser extends AppCompatActivity {
                             root.child(uniqueID).child("members").setValue(members);
                             Intent intent = new Intent(AddUser.this, ChatActivity.class);
                             intent.putExtra("threadID", uniqueID);
+                            intent.putExtra("receiver_email", receiver_email);
                             startActivity(intent);
                             finish();
                             break;

@@ -296,6 +296,7 @@ public class ChatThreads extends Fragment {
 
                             Intent intent = new Intent(getContext(), ChatActivity.class);
                             intent.putExtra("threadID", snapshot.getRef().getKey());
+                            intent.putExtra("receiver_email", receiver_email);
                             startActivity(intent);
                             break;
                         }
@@ -310,6 +311,7 @@ public class ChatThreads extends Fragment {
                             root.child(uniqueID).child("members").setValue(members);
                             Intent intent = new Intent(getContext(), ChatActivity.class);
                             intent.putExtra("threadID", uniqueID);
+                            intent.putExtra("receiver_email", receiver_email);
                             startActivity(intent);
                             break;
 

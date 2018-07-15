@@ -1,11 +1,15 @@
 package com.example.deviprasasdtripathy.awesomechat;
 
 import android.content.Intent;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.support.v7.widget.Toolbar;
+import android.view.View;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -31,6 +35,8 @@ import co.intentservice.chatui.models.ChatMessage;
 public class ChatActivity extends AppCompatActivity {
 
     private String threadID;
+    private String receiver_email;
+
     private DatabaseReference root = FirebaseDatabase.getInstance().getReference();
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     private String temp_key;
@@ -39,9 +45,23 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(R.style.Profile);
         setContentView(R.layout.activity_chat);
+        Toolbar toolbar = findViewById(R.id.chat_view_toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
 
         threadID = getIntent().getExtras().get("threadID").toString();
+        receiver_email = getIntent().getExtras().get("receiver_email").toString();
+
+        setTitle(receiver_email);
+
         root = FirebaseDatabase.getInstance().getReference().child("messages").child(threadID);
         user_name = user.getEmail();
         Log.e("threadID", threadID);
@@ -95,6 +115,7 @@ public class ChatActivity extends AppCompatActivity {
 
         //root = root.child("chats").child(room_name).child("messages");
     }
+
     private String chat_msg,chat_user_name, stime;
     private long time;
 
