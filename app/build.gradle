@@ -27,12 +27,18 @@ dependencies {
     implementation 'com.firebaseui:firebase-ui-auth:4.0.0'
     implementation 'com.google.firebase:firebase-database:16.0.1'
     implementation 'com.android.support:design:28.0.0-alpha3'
+    implementation 'com.android.support:support-v4:28.0.0-alpha3'
+    implementation 'com.android.support:recyclerview-v7:28.0.0-alpha3'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     compile 'com.google.firebase:firebase-core:16.0.1'
     compile 'com.github.timigod:android-chat-ui:v0.1.4'
     compile 'com.google.firebase:firebase-storage:16.0.1'
+    compile 'com.github.devahamed:multi-view-adapter:1.2.3'
+
+    // If you want to use data binding
+    compile 'com.github.devahamed:multi-view-adapter-databinding:1.2.3'
     implementation 'com.firebaseui:firebase-ui-database:4.1.0'
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'de.hdodenhof:circleimageview:2.2.0'

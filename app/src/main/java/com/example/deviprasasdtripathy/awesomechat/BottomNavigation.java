@@ -26,10 +26,8 @@ public class BottomNavigation extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(R.style.Profile);
         setContentView(R.layout.activity_bottom_navigation);
-
-        toolbar = getSupportActionBar();
-
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         BottomNavigationViewHelper.disableShiftMode(navigation);
@@ -42,10 +40,11 @@ public class BottomNavigation extends AppCompatActivity {
             // No user is signed in commence Login
             Intent intent = new Intent(BottomNavigation.this, LoginActivity.class);
             startActivity(intent);
+            finish();
         }
 
         //toolbar.setTitle("Home");
-        //loadFragment(new StoreFragment());
+        loadFragment(new ChatThreads());
     }
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -56,7 +55,7 @@ public class BottomNavigation extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
                     //toolbar.setTitle("Home");
-                    //loadFragment(new StoreFragment());
+                    loadFragment(new ChatThreads());
                     return true;
                 case R.id.add_user:
 //                    fragment = new SellFragment();

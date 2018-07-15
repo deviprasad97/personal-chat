@@ -92,10 +92,7 @@ public class ProfileEdit extends AppCompatActivity implements Imageutils.ImageAt
     }
     private void updateProfile(final View view){
         StorageReference profileStorageRef = FirebaseStorage.getInstance().getReference();
-
-
-
-        profileStorageRef.child("images/"+user.getUid()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+        profileStorageRef.child("images/"+user.getEmail()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
                 profilePath = uri;
@@ -113,7 +110,6 @@ public class ProfileEdit extends AppCompatActivity implements Imageutils.ImageAt
                                     Log.d("ProfileEdit", "User profile updated.");
                                     Snackbar.make(view, "Profile Updated", Snackbar.LENGTH_LONG)
                                             .setAction("Action", null).show();
-
                                 }
                             }
                         });
@@ -168,7 +164,7 @@ public class ProfileEdit extends AppCompatActivity implements Imageutils.ImageAt
             progressDialog.setTitle("Uploading...");
             progressDialog.show();
 
-            StorageReference ref = storageReference.child("images/"+ user.getUid());
+            StorageReference ref = storageReference.child("images/"+ user.getEmail());
             ref.putFile(filePath)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override

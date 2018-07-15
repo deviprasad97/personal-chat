@@ -409,10 +409,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                             if (task.isSuccessful()) {
                                 // Sign in success, update UI with the signed-in user's information
                                 Log.d("Stat", "createUserWithEmail:success");
-                                FirebaseUser user = mAuth.getCurrentUser();
-                                String uid = user.getUid();
-                                DatabaseReference myRef = database.getReference("users");
+                                final FirebaseUser user = mAuth.getCurrentUser();
+                                final String uid = user.getUid();
+                                final DatabaseReference myRef = database.getReference("users");
                                 myRef.child(uid).child("email").setValue(email);
+                                myRef.child(uid).child("uid").setValue(user.getUid());
 
                                 UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                                         .setDisplayName(mNameView.getText().toString())
@@ -424,11 +425,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
+                                                    myRef.child(uid).child("name").setValue(user.getDisplayName());
                                                     Log.d("Sign Up", "User profile updated.");
                                                 }
                                             }
                                         });
-
 
                                 updateUI(user);
                             } else {
