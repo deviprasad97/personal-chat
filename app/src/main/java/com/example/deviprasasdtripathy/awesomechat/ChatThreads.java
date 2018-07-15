@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.support.v7.widget.Toolbar;
 
 import com.ahamed.multiviewadapter.BaseViewHolder;
 import com.ahamed.multiviewadapter.ItemBinder;
@@ -70,6 +71,8 @@ public class ChatThreads extends Fragment {
     FirebaseAuth auth = FirebaseAuth.getInstance();
     //UserRecord userRecord = FirebaseAuth.getInstance();
     private OnFragmentInteractionListener mListener;
+    Toolbar toolbar;
+    TextView toolbar_chat_fragment;
 
     public ChatThreads() {
         // Required empty public constructor
@@ -100,11 +103,15 @@ public class ChatThreads extends Fragment {
         context = getContext();
         view = inflater.inflate(R.layout.fragment_chat_threads, container, false);
         mResultList =  view.findViewById(R.id.result_list);
+        toolbar = view.findViewById(R.id.bottom_nav_toolbar);
+        toolbar_chat_fragment = view.findViewById(R.id.toolbar_chat_fragment);
         mResultList.setHasFixedSize(true);
         mResultList.setLayoutManager(new LinearLayoutManager(context));
         mUserDatabase = FirebaseDatabase.getInstance().getReference("threads");
         mUserDatabaseRunner = FirebaseDatabase.getInstance().getReference("users");
         mResultList.setAdapter(firebaseRecyclerAdapter);
+        //toolbar.setTitle("Awesome Chat");
+        toolbar_chat_fragment.setText("Awesome Chat");
         getThreads();
 
 

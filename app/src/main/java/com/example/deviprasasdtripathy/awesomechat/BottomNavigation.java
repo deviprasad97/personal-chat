@@ -14,13 +14,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
+import android.support.v7.widget.Toolbar;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 
 public class BottomNavigation extends AppCompatActivity {
-    public ActionBar toolbar;
     boolean doubleBackToExitPressedOnce = false;
 
     @Override
@@ -28,6 +28,7 @@ public class BottomNavigation extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setTheme(R.style.Profile);
         setContentView(R.layout.activity_bottom_navigation);
+        //toolbar = getSupportActionBar();
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         BottomNavigationViewHelper.disableShiftMode(navigation);
@@ -42,8 +43,6 @@ public class BottomNavigation extends AppCompatActivity {
             startActivity(intent);
             finish();
         }
-
-        //toolbar.setTitle("Home");
         loadFragment(new ChatThreads());
     }
 
