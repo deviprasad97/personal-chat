@@ -20,10 +20,36 @@
         android:layout_gravity="bottom"
         android:background="?android:attr/windowBackground"
         android:foreground="?attr/selectableItemBackground"
-        app:itemBackground="@color/navColor"
-        app:itemIconTint="@android:color/white"
-        app:itemTextColor="@android:color/white"
+        app:itemBackground="@color/white"
+        app:itemIconTint="@android:color/background_dark"
+        app:itemTextColor="@android:color/black"
         app:menu="@menu/navigation" />
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/nunito_bold"
+        app:elevation="0dp">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/bottom_nav_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#ffffff"
+            android:fontFamily="@font/nunito_bold"
+            app:layout_scrollFlags="scroll|enterAlways" >
+
+            <TextView
+                android:id="@+id/toolbar_chat_fragment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#ffffff"
+                android:textSize="20sp"
+                android:fontFamily="@font/nunito_bold"
+                android:textColor="@android:color/black" />
+        </android.support.v7.widget.Toolbar>
+
+    </android.support.design.widget.AppBarLayout>
 
 
 </android.support.design.widget.CoordinatorLayout>

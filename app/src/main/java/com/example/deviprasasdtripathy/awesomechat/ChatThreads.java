@@ -36,6 +36,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -71,8 +72,7 @@ public class ChatThreads extends Fragment {
     FirebaseAuth auth = FirebaseAuth.getInstance();
     //UserRecord userRecord = FirebaseAuth.getInstance();
     private OnFragmentInteractionListener mListener;
-    Toolbar toolbar;
-    TextView toolbar_chat_fragment;
+
 
     public ChatThreads() {
         // Required empty public constructor
@@ -103,15 +103,12 @@ public class ChatThreads extends Fragment {
         context = getContext();
         view = inflater.inflate(R.layout.fragment_chat_threads, container, false);
         mResultList =  view.findViewById(R.id.result_list);
-        toolbar = view.findViewById(R.id.bottom_nav_toolbar);
-        toolbar_chat_fragment = view.findViewById(R.id.toolbar_chat_fragment);
         mResultList.setHasFixedSize(true);
         mResultList.setLayoutManager(new LinearLayoutManager(context));
         mUserDatabase = FirebaseDatabase.getInstance().getReference("threads");
         mUserDatabaseRunner = FirebaseDatabase.getInstance().getReference("users");
         mResultList.setAdapter(firebaseRecyclerAdapter);
         //toolbar.setTitle("Awesome Chat");
-        toolbar_chat_fragment.setText("Awesome Chat");
         getThreads();
 
 
@@ -304,7 +301,15 @@ public class ChatThreads extends Fragment {
                             Intent intent = new Intent(getContext(), ChatActivity.class);
                             intent.putExtra("threadID", snapshot.getRef().getKey());
                             intent.putExtra("receiver_email", receiver_email);
-                            startActivity(intent);
+                            StorageReference profileStorageRef = FirebaseStorage.getInstance().getReference();
+                            profileStorageRef.child("images/"+receiver_email).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    intent.putExtra("photo_url", uri);
+                                    startActivity(intent);
+
+                                }
+                            });
                             break;
                         }
                         else if(!(data.contains(receiver_email) && data.contains(currentUser)) && count == dataSnapshot.getChildrenCount()) {
@@ -319,7 +324,15 @@ public class ChatThreads extends Fragment {
                             Intent intent = new Intent(getContext(), ChatActivity.class);
                             intent.putExtra("threadID", uniqueID);
                             intent.putExtra("receiver_email", receiver_email);
-                            startActivity(intent);
+                            StorageReference profileStorageRef = FirebaseStorage.getInstance().getReference();
+                            profileStorageRef.child("images/"+receiver_email).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    intent.putExtra("photo_url", uri);
+                                    startActivity(intent);
+
+                                }
+                            });
                             break;
 
                         }

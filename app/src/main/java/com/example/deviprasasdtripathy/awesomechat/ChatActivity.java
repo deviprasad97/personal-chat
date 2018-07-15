@@ -1,6 +1,7 @@
 package com.example.deviprasasdtripathy.awesomechat;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,6 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.GenericTypeIndicator;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,6 +33,7 @@ import java.util.Map;
 
 import co.intentservice.chatui.ChatView;
 import co.intentservice.chatui.models.ChatMessage;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -42,12 +45,15 @@ public class ChatActivity extends AppCompatActivity {
     private String temp_key;
     ChatView chatView;
     private String user_name;
+    CircleImageView toolbar_profile_icon;
+    Uri uri;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setTheme(R.style.Profile);
         setContentView(R.layout.activity_chat);
         Toolbar toolbar = findViewById(R.id.chat_view_toolbar);
+        toolbar_profile_icon = (CircleImageView) findViewById(R.id.toolbar_profile_icon);
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -59,9 +65,14 @@ public class ChatActivity extends AppCompatActivity {
 
         threadID = getIntent().getExtras().get("threadID").toString();
         receiver_email = getIntent().getExtras().get("receiver_email").toString();
+        try {
+            uri = Uri.parse(getIntent().getExtras().get("photo_url").toString());
 
+        }catch (Exception e){
+            Log.e("photo_url", "not supplied");
+        }
         setTitle(receiver_email);
-
+        Picasso.get().load(uri).into(toolbar_profile_icon);
         root = FirebaseDatabase.getInstance().getReference().child("messages").child(threadID);
         user_name = user.getEmail();
         Log.e("threadID", threadID);

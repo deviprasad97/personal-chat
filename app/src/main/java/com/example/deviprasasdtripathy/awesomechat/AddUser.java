@@ -2,11 +2,14 @@ package com.example.deviprasasdtripathy.awesomechat;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,14 +21,20 @@ import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.UUID;
@@ -34,7 +43,8 @@ public class AddUser extends AppCompatActivity {
 
     private EditText mSearchField;
     private ImageButton mSearchBtn;
-
+    Toolbar toolbar;
+    TextView toolbar_add_user;
     private RecyclerView mResultList;
 
     private DatabaseReference mUserDatabase;
@@ -53,6 +63,8 @@ public class AddUser extends AppCompatActivity {
         mSearchField = (EditText) findViewById(R.id.search_field);
         mSearchBtn = (ImageButton) findViewById(R.id.search_btn);
         mResultList = (RecyclerView) findViewById(R.id.result_list);
+        toolbar = findViewById(R.id.bottom_nav_toolbar);
+        toolbar_add_user = findViewById(R.id.toolbar_add_user);
 
         mResultList.setHasFixedSize(true);
         mResultList.setLayoutManager(new LinearLayoutManager(this));
@@ -69,6 +81,10 @@ public class AddUser extends AppCompatActivity {
 
             }
         });
+        toolbar_add_user.setText("Search");
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
+        toolbar.setTitle("");
+        setSupportActionBar(toolbar);
     }
     public void onBackPressed() {
         Intent intent = new Intent(AddUser.this, BottomNavigation.class);
@@ -159,8 +175,16 @@ public class AddUser extends AppCompatActivity {
                             Intent intent = new Intent(AddUser.this, ChatActivity.class);
                             intent.putExtra("threadID", snapshot.getRef().getKey());
                             intent.putExtra("receiver_email", receiver_email);
-                            startActivity(intent);
-                            finish();
+                            StorageReference profileStorageRef = FirebaseStorage.getInstance().getReference();
+                            profileStorageRef.child("images/"+receiver_email).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    intent.putExtra("photo_url", uri);
+                                    startActivity(intent);
+                                    finish();
+
+                                }
+                            });
                             break;
                         }
                         else if(!(data.contains(receiver_email) && data.contains(currentUser)) && count == dataSnapshot.getChildrenCount()) {
@@ -175,10 +199,17 @@ public class AddUser extends AppCompatActivity {
                             Intent intent = new Intent(AddUser.this, ChatActivity.class);
                             intent.putExtra("threadID", uniqueID);
                             intent.putExtra("receiver_email", receiver_email);
-                            startActivity(intent);
-                            finish();
-                            break;
+                            StorageReference profileStorageRef = FirebaseStorage.getInstance().getReference();
+                            profileStorageRef.child("images/"+receiver_email).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    intent.putExtra("photo_url", uri);
+                                    startActivity(intent);
+                                    finish();
 
+                                }
+                            });
+                            break;
                         }
 
                     }
