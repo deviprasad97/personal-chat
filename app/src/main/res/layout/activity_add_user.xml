@@ -54,6 +54,7 @@
         android:layout_alignTop="@+id/search_field"
         android:layout_marginRight="30dp"
         android:background="@android:color/background_light"
+        android:foreground="?attr/selectableItemBackground"
         app:srcCompat="@mipmap/search_button"
         android:layout_alignParentRight="true" />
 

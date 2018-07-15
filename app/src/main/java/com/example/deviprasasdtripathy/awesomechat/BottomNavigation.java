@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -172,6 +173,9 @@ public class BottomNavigation extends AppCompatActivity {
                         .withIdentifier(1)
                         .withName("Profile")
                         .withIcon(R.drawable.ic_black_person_24dp);
+        SecondaryDrawerItem settings = new SecondaryDrawerItem().withName("Settings").withIcon(R.drawable.ic_settings_black_24dp);
+        SecondaryDrawerItem help = new SecondaryDrawerItem().withName("Help and Feedback").withIcon(R.drawable.ic_help_black_24dp);
+
 
         //create the drawer and remember the `Drawer` result object
         drawerResult = new DrawerBuilder()
@@ -183,12 +187,20 @@ public class BottomNavigation extends AppCompatActivity {
                         item1,
                         new DividerDrawerItem(),
                         new DividerDrawerItem(),
-                        new SecondaryDrawerItem().withName("Settings").withIcon(R.drawable.ic_settings_black_24dp),
-                        new SecondaryDrawerItem().withName("Help and Feedback").withIcon(R.drawable.ic_help_black_24dp)
+                        settings,
+                        help
                 )
                 .withOnDrawerItemClickListener((view, position, drawerItem) -> {
                     // do something with the clicked item :D
-                    Toast.makeText(getApplicationContext(),"item" + drawerItem.toString(), Toast.LENGTH_SHORT);
+                    if(drawerItem.equals(item1)){
+                        Intent intent = new Intent(BottomNavigation.this, ProfileActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }else if(drawerItem.equals(settings)){
+                        Intent intent = new Intent(BottomNavigation.this, ProfileEdit.class);
+                        startActivity(intent);
+                        finish();
+                    }
                     return true;
                 })
                 .build();

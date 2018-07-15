@@ -85,6 +85,13 @@ public class AddUser extends AppCompatActivity {
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+
     }
     public void onBackPressed() {
         Intent intent = new Intent(AddUser.this, BottomNavigation.class);
