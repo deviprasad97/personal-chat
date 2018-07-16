@@ -39,6 +39,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private String threadID;
     private String receiver_email;
+    int i= 0;
 
     private DatabaseReference root = FirebaseDatabase.getInstance().getReference();
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -99,7 +100,9 @@ public class ChatActivity extends AppCompatActivity {
         root.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                Log.e("OnChild added", "okay here" +i);
                 append_chat_conversation(dataSnapshot);
+                i++;
             }
 
             @Override

@@ -40,6 +40,7 @@ public class ProfileEdit extends AppCompatActivity implements Imageutils.ImageAt
 
     private CircleImageView profileImage;
     private AutoCompleteTextView name;
+    private AutoCompleteTextView password;
     private Button update;
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     Imageutils imageutils;
@@ -62,6 +63,8 @@ public class ProfileEdit extends AppCompatActivity implements Imageutils.ImageAt
         setContentView(R.layout.activity_profile_edit);
         profileImage = (CircleImageView) findViewById(R.id.edit_profile_image);
         name = (AutoCompleteTextView) findViewById(R.id.editProfileName);
+        password = (AutoCompleteTextView) findViewById(R.id.editPassword);
+
         update = (Button) findViewById(R.id.update);
         photoUpload = (TextView) findViewById(R.id.profile_image_upload);
 
@@ -107,6 +110,11 @@ public class ProfileEdit extends AppCompatActivity implements Imageutils.ImageAt
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
+                                    if(!password.getText().toString().isEmpty()){
+                                        user.updatePassword(password.getText().toString());
+                                        Snackbar.make(view, "Password Updated", Snackbar.LENGTH_SHORT)
+                                                .setAction("Action", null).show();
+                                    }
                                     Log.d("ProfileEdit", "User profile updated.");
                                     Snackbar.make(view, "Profile Updated", Snackbar.LENGTH_LONG)
                                             .setAction("Action", null).show();
