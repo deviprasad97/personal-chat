@@ -40,7 +40,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     compile 'com.google.firebase:firebase-core:16.0.1'
-    compile 'com.github.timigod:android-chat-ui:v0.1.4'
     compile 'com.google.firebase:firebase-storage:16.0.1'
     compile 'com.github.devahamed:multi-view-adapter:1.2.3'
 
@@ -58,5 +57,6 @@ dependencies {
 
     implementation 'com.github.bumptech.glide:glide:4.0.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.0.0'
+    compile project(':chat-ui')
 }
 apply plugin: 'com.google.gms.google-services'

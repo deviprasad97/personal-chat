@@ -161,7 +161,7 @@ public class ChatActivity extends AppCompatActivity {
                 chatView.addMessage(message);
 
             }else {
-                co.intentservice.chatui.models.ChatMessage message = new ChatMessage(chat_msg, time, ChatMessage.Type.RECEIVED);
+                co.intentservice.chatui.models.ChatMessage message = new ChatMessage(chat_msg, time, ChatMessage.Type.RECEIVED,uri);
                 chatView.addMessage(message);
             }
         }
