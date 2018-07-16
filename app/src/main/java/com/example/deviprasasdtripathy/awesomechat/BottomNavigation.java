@@ -60,6 +60,9 @@ public class BottomNavigation extends AppCompatActivity {
     Drawer drawerResult;
     AccountHeader headerResult;
     final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    Uri photUri;
+    String displayName;
+    String displayEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +75,6 @@ public class BottomNavigation extends AppCompatActivity {
         toolbar_chat_fragment = findViewById(R.id.toolbar_chat_fragment);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
         BottomNavigationViewHelper.disableShiftMode(navigation);
-
         if (user != null) {
             // User is signed in do nothing
             Log.e("User:", user.getEmail().toString());
@@ -82,6 +84,19 @@ public class BottomNavigation extends AppCompatActivity {
             startActivity(intent);
             finish();
         }
+        try {
+            Log.e("Check", user.getPhotoUrl().toString());
+            photUri = user.getPhotoUrl();
+            displayName = user.getDisplayName();
+            displayEmail = user.getEmail();
+        }catch (Exception e){
+            Log.e("Check", "Null Pointer Exception happened");
+            photUri = Uri.parse("https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png");
+            displayName = "No User";
+            displayEmail = "No Email";
+
+        }
+
         setUpDrawer();
         toolbar_chat_fragment.setText("Awesome Chat");
         toolbar.setNavigationIcon(R.drawable.ic_menu_black_24dp);
@@ -157,12 +172,12 @@ public class BottomNavigation extends AppCompatActivity {
         // Create the AccountHeader
         headerResult = new AccountHeaderBuilder()
                 .withActivity(this)
-                .withHeaderBackground(new ImageHolder(user.getPhotoUrl()))
+                .withHeaderBackground(new ImageHolder(photUri))
                 .addProfiles(
                         new ProfileDrawerItem()
-                                .withName(user.getDisplayName())
-                                .withEmail(user.getEmail())
-                                .withIcon(user.getPhotoUrl())
+                                .withName(displayName)
+                                .withEmail(displayEmail)
+                                .withIcon(photUri)
                 )
                 .withOnAccountHeaderListener((view, profile, currentProfile) -> false)
                 .build();
