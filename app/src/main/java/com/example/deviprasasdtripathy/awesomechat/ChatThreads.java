@@ -144,7 +144,6 @@ public class ChatThreads extends Fragment {
                     }
                 }
                 //
-                Log.e("thread", t.get(0).getEmail());
                 SimpleRecyclerAdapter<Thread, CarBinder> adapter =
                         new SimpleRecyclerAdapter<>(new CarBinder());
 
