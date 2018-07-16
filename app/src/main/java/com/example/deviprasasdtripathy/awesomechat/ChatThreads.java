@@ -309,6 +309,13 @@ public class ChatThreads extends Fragment {
                                     startActivity(intent);
 
                                 }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    intent.putExtra("photo_url", Uri.parse("https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png"));
+                                    startActivity(intent);
+
+                                }
                             });
                             break;
                         }
@@ -331,6 +338,12 @@ public class ChatThreads extends Fragment {
                                     intent.putExtra("photo_url", uri);
                                     startActivity(intent);
 
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    intent.putExtra("photo_url", Uri.parse("https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png"));
+                                    startActivity(intent);
                                 }
                             });
                             break;
