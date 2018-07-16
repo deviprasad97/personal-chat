@@ -508,6 +508,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             Log.e("status","Done");
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(intent);
+            finish();
 
         } else {
             Log.e("status","Nope");

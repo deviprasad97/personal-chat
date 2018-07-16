@@ -12,6 +12,7 @@ import android.util.Log;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -43,6 +44,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private DatabaseReference root = FirebaseDatabase.getInstance().getReference();
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    private DatabaseReference notifications = FirebaseDatabase.getInstance().getReference().child("notifications");
     private String temp_key;
     ChatView chatView;
     private String user_name;
@@ -94,6 +96,15 @@ public class ChatActivity extends AppCompatActivity {
 
                 message_root.updateChildren(map2);
                 chatView.getInputEditText().setText("");
+                /*HashMap <String, String> notificationData = new HashMap<>();
+                notificationData.put("from", user.getEmail());
+                notificationData.put("type", "message");
+                notifications.child("receiver_email").push().setValue(notificationData).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+
+                    }
+                });*/
                 return false;
             }
         });

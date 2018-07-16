@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.common.images.internal.ImageUtils;
@@ -40,6 +41,7 @@ public class ProfileActivity extends AppCompatActivity{
     TextView logOut;
     CircleImageView profilePic;
     FirebaseStorage storage;
+    RelativeLayout layout_logout;
     StorageReference storageReference;
     private Uri filePath;
     private Bitmap bitmap;
@@ -57,6 +59,7 @@ public class ProfileActivity extends AppCompatActivity{
         profileName = (TextView) findViewById(R.id.profileName);
         profileEmail = (TextView) findViewById(R.id.tvNumber3);
         logOut = (TextView) findViewById(R.id.tvNumber7);
+        layout_logout = (RelativeLayout) findViewById(R.id.layout_logout);
         profilePic = (CircleImageView) findViewById(R.id.profile_image);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         storageReference = FirebaseStorage.getInstance().getReference();
@@ -85,6 +88,15 @@ public class ProfileActivity extends AppCompatActivity{
             }
         });
         logOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+        layout_logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 FirebaseAuth.getInstance().signOut();
