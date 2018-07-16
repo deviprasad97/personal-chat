@@ -30,9 +30,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="199dp">
 
                 <TextView
                     android:id="@+id/heading_email"
@@ -44,19 +45,22 @@
                     android:layout_marginTop="0dp"
                     android:fontFamily="@font/nunito_bold"
                     android:includeFontPadding="false"
+                    android:paddingTop="100dp"
                     android:text="@string/login"
                     android:textColor="#555555"
-                    android:textSize="20sp" />
+                    android:textSize="30sp" />
 
                 <Switch
                     android:id="@+id/loginswitch"
                     android:layout_width="134dp"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentTop="true"
+                    android:gravity="left|right|fill_horizontal"
+                    android:textColor="@color/black"
                     android:textOff="@string/no"
                     android:textOn="@string/yes"
-                    android:textSize="10dp"
-                    android:layout_alignParentEnd="true" />
+                    android:textSize="10dp" />
             </RelativeLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -175,10 +179,12 @@
                 android:layout_marginTop="16dp"
                 android:text="@string/action_sign_up"
                 android:textStyle="bold" />
+
             <com.google.android.gms.common.SignInButton
                 android:id="@+id/sign_in_button"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"/>
 
         </LinearLayout>
     </ScrollView>
