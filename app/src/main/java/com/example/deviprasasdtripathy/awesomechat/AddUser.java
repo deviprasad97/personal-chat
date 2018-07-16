@@ -47,7 +47,7 @@ public class AddUser extends AppCompatActivity {
     Toolbar toolbar;
     TextView toolbar_add_user;
     private RecyclerView mResultList;
-
+    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     private DatabaseReference mUserDatabase;
     private FirebaseRecyclerAdapter<Users, UsersViewHolder> firebaseRecyclerAdapter;
     @Override
@@ -121,7 +121,12 @@ public class AddUser extends AppCompatActivity {
 
             @Override
             protected void onBindViewHolder(UsersViewHolder holder, int position, Users model) {
-                holder.setDetails(getApplicationContext(), model.getEmail());
+                if(!user.getEmail().equals(model.getEmail())){
+                    holder.setDetails(getApplicationContext(), model.getEmail());
+                }else {
+                    holder.setDetails(getApplicationContext(), "curr");
+                }
+
             }
         };
 
@@ -150,6 +155,9 @@ public class AddUser extends AppCompatActivity {
             if(userName == null || userName.isEmpty() || userName.equals(" ")){
                 Log.e("Username", "Its Empty");
                 user_name.setText("No User Found");
+            }
+            else if(userName.equals("curr")){
+                user_name.setVisibility(View.GONE);
             }else{
                 Log.e("Username", userName);
                 user_name.setText(userName);

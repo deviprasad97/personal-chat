@@ -16,7 +16,6 @@
         android:layout_toEndOf="@+id/profile_image"
         android:fontFamily="@font/nunito_semibold"
         android:background="?attr/selectableItemBackgroundBorderless"
-        android:text="Username"
         android:textColor="#555555"
         android:textSize="16sp"
         android:layout_toRightOf="@+id/profile_image"
