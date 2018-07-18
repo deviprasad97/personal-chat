@@ -1,6 +1,7 @@
 package co.intentservice.chatui.viewholders;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 
@@ -57,6 +58,10 @@ public class MessageViewHolder {
 
     public void setProfileIcon(String uri){
         messageView.setProfileIcon(uri);
+    }
+
+    public void setImageMessage(Uri imageMessage){
+        messageView.setImageMessage(imageMessage);
     }
 
     public void setSender(String sender) {

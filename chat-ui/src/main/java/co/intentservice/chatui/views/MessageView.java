@@ -3,10 +3,11 @@ package co.intentservice.chatui.views;
 import android.content.Context;
 import android.net.Uri;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.toolbox.NetworkImageView;
 import com.squareup.picasso.Picasso;
 
 import co.intentservice.chatui.R;
@@ -23,13 +24,51 @@ public abstract class MessageView extends FrameLayout {
 
     private TextView senderTextView;
     private CircleImageView circleImageView;
+    private ImageView imageMessageView;
+    private TextView messageTextView;
+
 
     /**
      * Method to set the messages text in the view so it can be displayed on the screen.
      *
      * @param message The message that you want to be displayed.
      */
-    public abstract void setMessage(String message);
+    public void setMessage(String message){
+        if(message != null){
+            if (messageTextView == null) {
+                this.messageTextView = (TextView) findViewById(R.id.message_text_view);
+            }
+            messageTextView.setVisibility(VISIBLE);
+            messageTextView.setText(message);
+        }else {
+            this.messageTextView = (TextView) findViewById(R.id.message_text_view);
+            messageTextView.setVisibility(GONE);
+            messageTextView.setText("");
+        }
+    }
+
+    /**
+     * Method to set the messages text in the view so it can be displayed on the screen.
+     *
+     * @param imageMessage The message that you want to be displayed.
+     */
+    public void setImageMessage(Uri imageMessage){
+        if(imageMessage != null){
+            if (imageMessageView == null) {
+                this.imageMessageView = (ImageView) findViewById(R.id.image_message_view);
+                this.messageTextView = (TextView) findViewById(R.id.message_text_view);
+            }
+            imageMessageView.setVisibility(VISIBLE);
+            messageTextView.setVisibility(GONE);
+            messageTextView.setText("");
+            Picasso.get().load(imageMessage).into(imageMessageView);
+        }else{
+            this.imageMessageView = (ImageView) findViewById(R.id.image_message_view);
+            Picasso.get().cancelRequest(imageMessageView);
+            imageMessageView.setImageDrawable(null);
+        }
+
+    }
 
     /**
      * Method to set the timestamp that the message was received or sent on the screen.

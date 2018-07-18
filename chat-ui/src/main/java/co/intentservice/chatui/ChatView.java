@@ -388,6 +388,7 @@ public class ChatView extends RelativeLayout {
 
     public void removeMessage(int position) {
         chatViewListAdapter.removeMessage(position);
+        chatViewListAdapter.notifyDataSetChanged();
     }
 
     public void clearMessages() {

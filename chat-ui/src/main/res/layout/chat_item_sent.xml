@@ -48,8 +48,19 @@
                 android:textSize="@dimen/default_message_text_size"
                 android:textColor="@color/default_message_color_send"
                 android:gravity="center_vertical|start"
+                android:visibility="gone"
+                tools:visibility="visible"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
+
+            <ImageView
+                android:id="@+id/image_message_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@color/dark_gray"
+                android:visibility="gone"
+                tools:visibility="visible"
+                tools:src="@drawable/ic_photo_black_24dp"/>
 
             <android.support.v4.widget.Space
                 android:layout_width="match_parent"

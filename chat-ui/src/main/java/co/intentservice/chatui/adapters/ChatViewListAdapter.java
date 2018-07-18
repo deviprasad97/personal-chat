@@ -1,6 +1,7 @@
 package co.intentservice.chatui.adapters;
 
 import android.content.Context;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +50,7 @@ public class ChatViewListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
+        System.out.println(chatMessages.toString());
         return chatMessages.size();
     }
 
@@ -92,17 +94,29 @@ public class ChatViewListAdapter extends BaseAdapter {
             holder = (MessageViewHolder) convertView.getTag();
         }
 
-        holder.setMessage(chatMessages.get(position).getMessage());
         holder.setTimestamp(chatMessages.get(position).getFormattedTime());
         holder.setElevation(bubbleElevation);
         holder.setBackground(type);
         String sender = chatMessages.get(position).getSender();
         String uri = chatMessages.get(position).getUri();
+        String textMessage = chatMessages.get(position).getMessage();
+        Uri imageMessage = chatMessages.get(position).getImageMessage();
         if (sender != null) {
             holder.setSender(sender);
         }
         if (uri != null && !uri.isEmpty()){
             holder.setProfileIcon(uri);
+
+        }
+        if(textMessage!=null){
+            holder.setMessage(textMessage);
+            textMessage = null;
+        }
+        if(imageMessage != null){
+            holder.setImageMessage(imageMessage);
+            imageMessage = null;
+        }else if(imageMessage == null){
+            holder.setImageMessage(null);
         }
         return convertView;
     }

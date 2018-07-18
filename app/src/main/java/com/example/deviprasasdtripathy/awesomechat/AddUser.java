@@ -59,6 +59,7 @@ public class AddUser extends AppCompatActivity {
 
         // Firebase Initialize
         mUserDatabase = FirebaseDatabase.getInstance().getReference("users");
+        mUserDatabase.keepSynced(true);
 
         // Activity Objects initialize
         mSearchField = (EditText) findViewById(R.id.search_field);
@@ -176,6 +177,7 @@ public class AddUser extends AppCompatActivity {
             final String currentUser = user.getEmail();
             final ArrayList<String> participants = new ArrayList<>();
             Query firebaseSearchQuery = root.child("threads");
+            firebaseSearchQuery.keepSynced(true);
             firebaseSearchQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -217,6 +219,7 @@ public class AddUser extends AppCompatActivity {
                             members.add(receiver_email);
                             members.add(currentUser);
                             root = root.child("threads");
+                            root.keepSynced(true);
                             String uniqueID = UUID.randomUUID().toString();
                             root.child(uniqueID).child("members").setValue(members);
                             Intent intent = new Intent(AddUser.this, ChatActivity.class);

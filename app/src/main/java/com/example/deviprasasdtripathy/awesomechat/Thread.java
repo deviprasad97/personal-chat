@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Thread {
 
-    public String name, email, uid;
+    public String name, email, uid, threadID;
 
 
     public String getName() {
@@ -19,6 +19,14 @@ public class Thread {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getThreadID() {
+        return threadID;
+    }
+
+    public void setThreadID(String threadID) {
+        this.threadID = threadID;
     }
 
     public void setEmail(String image) {
@@ -38,7 +46,8 @@ public class Thread {
         this.email = email;
         this.uid = uid;
     }
-    public Thread(String email) {
+    public Thread(String email, String threadID) {
         this.email = email;
+        this.threadID = threadID;
     }
 }

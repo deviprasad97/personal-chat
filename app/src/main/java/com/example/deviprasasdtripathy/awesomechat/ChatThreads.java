@@ -37,6 +37,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -106,7 +108,9 @@ public class ChatThreads extends Fragment {
         mResultList.setHasFixedSize(true);
         mResultList.setLayoutManager(new LinearLayoutManager(context));
         mUserDatabase = FirebaseDatabase.getInstance().getReference("threads");
+        mUserDatabase.keepSynced(true);
         mUserDatabaseRunner = FirebaseDatabase.getInstance().getReference("users");
+        mUserDatabaseRunner.keepSynced(true);
         mResultList.setAdapter(firebaseRecyclerAdapter);
         //toolbar.setTitle("Awesome Chat");
         getThreads();
@@ -139,7 +143,7 @@ public class ChatThreads extends Fragment {
                         record = record.replace("}", "").trim();
                         Log.e("Record replace", record);
                         receiver.add(record);
-                        t.add(new Thread(record));
+                        t.add(new Thread(record, ds.getKey()));
 
                     }
                 }
@@ -181,41 +185,13 @@ public class ChatThreads extends Fragment {
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(Uri uri);
     }
-    public static class UsersViewHolder extends RecyclerView.ViewHolder {
-
-        View mView;
-
-        public UsersViewHolder(View itemView) {
-            super(itemView);
-
-            mView = itemView;
-
-        }
-
-        public void setDetails(Context ctx, String userName, String userStatus, String userImage){
-
-            TextView user_name = (TextView) mView.findViewById(R.id.name_text);
-            TextView user_status = (TextView) mView.findViewById(R.id.status_text);
-            ImageView user_image = (ImageView) mView.findViewById(R.id.profile_image);
-
-
-            user_name.setText(userName);
-            user_status.setText(userStatus);
-
-            Glide.with(ctx).load(userImage).into(user_image);
-
-
-        }
-
-
-        public void setDetails(Context applicationContext, String name) {
-            TextView user_name = (TextView) mView.findViewById(R.id.email_text);
-            user_name.setText(name);
-        }
-    }
     public class CarBinder extends ItemBinder<Thread, CarBinder.CarViewHolder> {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         private DatabaseReference root = FirebaseDatabase.getInstance().getReference();
+        private DatabaseReference lastMessage = FirebaseDatabase.getInstance().getReference();
+        private String lastMessageValue;
+        private String access;
+        private String sender;
         private Uri profilePath;
 
         @Override public CarViewHolder create(LayoutInflater inflater, ViewGroup parent) {
@@ -233,7 +209,17 @@ public class ChatThreads extends Fragment {
                 @Override
                 public void onSuccess(Uri uri) {
                     profilePath = uri;
-                    Picasso.get().load(uri).into(holder.profile_image);
+                    Picasso.get().load(uri).networkPolicy(NetworkPolicy.OFFLINE).into(holder.profile_image, new Callback() {
+                        @Override
+                        public void onSuccess() {
+
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            Picasso.get().load(uri).into(holder.profile_image);
+                        }
+                    });
 
                 }
 
@@ -241,7 +227,19 @@ public class ChatThreads extends Fragment {
                 @Override
                 public void onFailure(@NonNull Exception e) {
                     Picasso.get().load(Uri.parse("https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png"))
-                            .into(holder.profile_image);
+                            .networkPolicy(NetworkPolicy.OFFLINE)
+                            .into(holder.profile_image, new Callback() {
+                                @Override
+                                public void onSuccess() {
+
+                                }
+
+                                @Override
+                                public void onError(Exception e) {
+                                    Picasso.get().load(Uri.parse("https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png"))
+                                            .into(holder.profile_image);
+                                }
+                            });
                 }
             });
             holder.user_name.setOnClickListener(new View.OnClickListener() {
@@ -256,7 +254,31 @@ public class ChatThreads extends Fragment {
                     openChatActivity(item.getEmail());
                 }
             });
+            Query firebaseLastMessageQuery = lastMessage.child("messages").child(item.getThreadID());
+            firebaseLastMessageQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for(DataSnapshot ds : dataSnapshot.getChildren()){
+                        access = ds.child("-"+user.getEmail().replace(".","")).getValue().toString();
+                        sender = ds.child("name").getValue().toString();
+                        lastMessageValue = ds.child("msg").getValue().toString();
+                    }
+                    if(lastMessageValue!=null && access.equals("true")){
+                        if(sender.equals(user.getEmail()))
+                            holder.lastMessagView.setText("You: " + lastMessageValue);
+                        else
+                            holder.lastMessagView.setText(lastMessageValue);
+                    }else {
+                        holder.lastMessagView.setText("No messages");
+                    }
 
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
 
         }
 
@@ -267,6 +289,7 @@ public class ChatThreads extends Fragment {
 
         class CarViewHolder extends BaseViewHolder<Thread> {
             TextView user_name;
+            TextView lastMessagView;
             CircleImageView profile_image;
             StorageReference profileStorageRef;
             RelativeLayout relativeLayout;
@@ -276,6 +299,7 @@ public class ChatThreads extends Fragment {
                 profile_image = (CircleImageView) itemView.findViewById(R.id.profile_image);
                 profileStorageRef = FirebaseStorage.getInstance().getReference();
                 relativeLayout = itemView.findViewById(R.id.threadLayout);
+                lastMessagView = itemView.findViewById(R.id.status_text);
 
             }
 
@@ -318,13 +342,15 @@ public class ChatThreads extends Fragment {
                             });
                             break;
                         }
-                        else if(!(data.contains(receiver_email) && data.contains(currentUser)) && count == dataSnapshot.getChildrenCount()) {
+                        else if(!(data.contains(receiver_email) && data.contains(currentUser))
+                                && count == dataSnapshot.getChildrenCount()) {
                             Log.e("In else if","let's see");
                             Log.e("Count", count+"");
                             ArrayList<String> members = new ArrayList<>();
                             members.add(receiver_email);
                             members.add(currentUser);
                             root = root.child("threads");
+                            root.keepSynced(true);
                             String uniqueID = UUID.randomUUID().toString();
                             root.child(uniqueID).child("members").setValue(members);
                             Intent intent = new Intent(getContext(), ChatActivity.class);
