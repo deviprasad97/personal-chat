@@ -31,6 +31,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -60,6 +62,7 @@ public class BottomNavigation extends AppCompatActivity {
     Drawer drawerResult;
     AccountHeader headerResult;
     final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    DatabaseReference ref;
     Uri photUri;
     String displayName;
     String displayEmail;
@@ -78,12 +81,14 @@ public class BottomNavigation extends AppCompatActivity {
         if (user != null) {
             // User is signed in do nothing
             Log.e("User:", user.getEmail().toString());
+            ref = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid());
         } else {
             // No user is signed in commence Login
             Intent intent = new Intent(BottomNavigation.this, LoginActivity.class);
             startActivity(intent);
             finish();
         }
+
         try {
             Log.e("Check", user.getPhotoUrl().toString());
             photUri = user.getPhotoUrl();
@@ -104,6 +109,23 @@ public class BottomNavigation extends AppCompatActivity {
         setSupportActionBar(toolbar);
         loadFragment(new ChatThreads());
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(user != null){
+            ref.child("online").setValue("true");
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(user != null){
+            ref.child("online").setValue("false");
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

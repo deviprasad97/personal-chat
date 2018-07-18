@@ -73,6 +73,26 @@
             app:layout_constraintTop_toBottomOf="@+id/email_text"
             app:layout_constraintVertical_bias="0.111" />
 
+        <ImageView
+            android:id="@+id/online"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"
+            tools:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@+id/status_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/email_text"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0"
+            app:srcCompat="@mipmap/online" />
+
     </android.support.constraint.ConstraintLayout>
 
     <!---<include layout="@layout/item_divider_thread"/>-->

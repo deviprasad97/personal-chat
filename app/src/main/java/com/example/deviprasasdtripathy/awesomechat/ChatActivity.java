@@ -182,6 +182,12 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        messageKey.clear();
+    }
+
+    @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         if(v.getId() == R.id.chat_list){
@@ -204,6 +210,8 @@ public class ChatActivity extends AppCompatActivity {
                 Log.e("Delete", "Selected "+position);
                 deleteRef.child("-"+user.getEmail().replace(".","")).setValue("false");
                 chatView.removeMessage(position);
+                messageKey.remove(position);
+                Log.e("After Delete", messageKey.toString() + " Size " + messageKey.size());
 
                 return true;
             default:
@@ -254,11 +262,8 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void append_chat_conversation(DataSnapshot dataSnapshot) {
-        if(messageKey != null){
-            messageKey.clear();
-        }
-        messageKey.add(dataSnapshot.getKey());
-        Log.e("message key->", messageKey.get(0));
+        String key = dataSnapshot.getKey();
+        Log.e("message key->", messageKey.toString());
         Iterator i = dataSnapshot.getChildren().iterator();
         while (i.hasNext()){
             DataSnapshot part1, part2;
@@ -288,6 +293,7 @@ public class ChatActivity extends AppCompatActivity {
             //chat_conversation.append(chat_user_name +" : "+chat_msg +" \n");
             if(type.equals("text")){
                 if(access.equals("true")){
+                    messageKey.add(key);
                     if(user_name.equals(chat_user_name)){
                         co.intentservice.chatui.models.ChatMessage message = new ChatMessage(chat_msg, time, ChatMessage.Type.SENT);
                         chatView.addMessage(message);
@@ -302,6 +308,7 @@ public class ChatActivity extends AppCompatActivity {
                 Uri imageMessage = Uri.parse(chat_msg);
                 Log.e("Chat Image", chat_msg);
                 if(access.equals("true")) {
+                    messageKey.add(key);
                     if (user_name.equals(chat_user_name)) {
                         co.intentservice.chatui.models.ChatMessage message = new ChatMessage(imageMessage, time, ChatMessage.Type.SENT);
                         chatView.addMessage(message);

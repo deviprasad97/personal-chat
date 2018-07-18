@@ -189,6 +189,7 @@ public class ChatThreads extends Fragment {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         private DatabaseReference root = FirebaseDatabase.getInstance().getReference();
         private DatabaseReference lastMessage = FirebaseDatabase.getInstance().getReference();
+        private DatabaseReference users = FirebaseDatabase.getInstance().getReference().child("users");
         private String lastMessageValue;
         private String access;
         private String sender;
@@ -286,6 +287,27 @@ public class ChatThreads extends Fragment {
 
                 }
             });
+            Query userOnlineStatusQuery = users;
+            userOnlineStatusQuery.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    for(DataSnapshot each_user: dataSnapshot.getChildren()){
+                        if(each_user.child("email").getValue().toString().equals(item.getEmail())){
+                            if(each_user.child("online").getValue().toString().equals("true")){
+                                holder.online.setVisibility(View.VISIBLE);
+                            }else {
+                                holder.online.setVisibility(View.GONE);
+                            }
+                            Log.e("snapshot", item.getEmail());
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                }
+            });
 
         }
 
@@ -298,6 +320,7 @@ public class ChatThreads extends Fragment {
             TextView user_name;
             TextView lastMessagView;
             CircleImageView profile_image;
+            ImageView online;
             StorageReference profileStorageRef;
             RelativeLayout relativeLayout;
             public CarViewHolder(View itemView) {
@@ -307,6 +330,7 @@ public class ChatThreads extends Fragment {
                 profileStorageRef = FirebaseStorage.getInstance().getReference();
                 relativeLayout = itemView.findViewById(R.id.threadLayout);
                 lastMessagView = itemView.findViewById(R.id.status_text);
+                online = itemView.findViewById(R.id.online);
 
             }
 
