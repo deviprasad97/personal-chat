@@ -264,10 +264,17 @@ public class ChatThreads extends Fragment {
                         lastMessageValue = ds.child("msg").getValue().toString();
                     }
                     if(lastMessageValue!=null && access.equals("true")){
-                        if(sender.equals(user.getEmail()))
-                            holder.lastMessagView.setText("You: " + lastMessageValue);
-                        else
-                            holder.lastMessagView.setText(lastMessageValue);
+                        if(!lastMessageValue.contains("https://firebasestorage.googleapis.com/")){
+                            if(sender.equals(user.getEmail()))
+                                holder.lastMessagView.setText("You: " + lastMessageValue);
+                            else
+                                holder.lastMessagView.setText(lastMessageValue);
+                        }else {
+                            if(sender.equals(user.getEmail()))
+                                holder.lastMessagView.setText("You: Image");
+                            else
+                                holder.lastMessagView.setText("Image");
+                        }
                     }else {
                         holder.lastMessagView.setText("No messages");
                     }
