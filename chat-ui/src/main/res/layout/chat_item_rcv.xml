@@ -55,6 +55,13 @@
                     android:visibility="gone"
                     tools:visibility="visible"/>
 
+                <io.github.ponnamkarthik.richlinkpreview.RichLinkViewTelegram
+                    android:id="@+id/richLinkView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    tools:visibility="visible"/>
+
                 <ImageView
                     android:id="@+id/image_message_view"
                     android:layout_width="wrap_content"

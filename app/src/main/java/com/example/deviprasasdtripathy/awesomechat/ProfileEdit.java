@@ -25,6 +25,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -44,7 +46,7 @@ public class ProfileEdit extends AppCompatActivity implements Imageutils.ImageAt
     private Button update;
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     Imageutils imageutils;
-
+    DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users");
     private Uri filePath;
     private Uri profilePath;
     private Bitmap bitmap;
@@ -112,6 +114,7 @@ public class ProfileEdit extends AppCompatActivity implements Imageutils.ImageAt
                                 if (task.isSuccessful()) {
                                     if(!password.getText().toString().isEmpty()){
                                         user.updatePassword(password.getText().toString());
+                                        userRef.child(user.getUid()).child("image").setValue(profilePath.toString());
                                         Snackbar.make(view, "Password Updated", Snackbar.LENGTH_SHORT)
                                                 .setAction("Action", null).show();
                                     }

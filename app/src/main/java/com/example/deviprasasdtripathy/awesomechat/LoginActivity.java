@@ -343,6 +343,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                                 Log.w("Stat", "signInWithEmail:failure", task.getException());
                                 Toast.makeText(LoginActivity.this, "Authentication failed.",
                                         Toast.LENGTH_SHORT).show();
+                                finish();
+                                startActivity(getIntent());
                                 updateUI(null);
                             }
 
@@ -427,12 +429,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                                         .setPhotoUri(Uri.parse("https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png"))
                                         .build();
 
+
                                 user.updateProfile(profileUpdates)
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override
                                             public void onComplete(@NonNull Task<Void> task) {
                                                 if (task.isSuccessful()) {
                                                     myRef.child(uid).child("name").setValue(user.getDisplayName());
+                                                    myRef.child(uid).child("image").setValue("https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png");
                                                     Log.d("Sign Up", "User profile updated.");
                                                 }
                                             }
@@ -505,13 +509,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private void updateUI(FirebaseUser user) {
         //hideProgressDialog();
         if (user != null) {
-            Log.e("status","Done");
+            //Log.e("status","Done");
             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             startActivity(intent);
             finish();
 
         } else {
-            Log.e("status","Nope");
+            //Log.e("status","Nope");
         }
     }
 

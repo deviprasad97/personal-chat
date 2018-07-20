@@ -41,6 +41,7 @@ import com.squareup.picasso.Callback;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
+import java.security.spec.ECField;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -131,25 +132,30 @@ public class ChatThreads extends Fragment {
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
                     String email1 = " ";
                     String email2 = " ";
+                    try {
+                        record = ds.child("members").child("0").getValue().toString() + " "
+                                + ds.child("members").child("1").getValue().toString();
+                    }catch (Exception e){
+                        Log.e("Record", "Exeption");
+                    }
 
-                    record = ds.getValue().toString();
-                    Log.e("Record", record);
+                    //Log.e("Record", record);
                     //{members=[tripathy.devi@yahoo.com, hello@helloworld.com]}
                     if (record.contains(user.getEmail())) {
-                        record = record.replace("{members=[", "");
-                        record = record.replace(user.getEmail(), "");
-                        record = record.replace(",", "");
-                        record = record.replace("]", "");
-                        record = record.replace("}", "").trim();
-                        Log.e("Record replace", record);
+                        if(ds.child("members").child("0").getValue().toString().equals(user.getEmail())){
+                            record = ds.child("members").child("1").getValue().toString();
+                        }else {
+                            record = ds.child("members").child("0").getValue().toString();
+                        }
+                        //Log.e("Record replace", record);
                         receiver.add(record);
                         t.add(new Thread(record, ds.getKey()));
 
                     }
                 }
                 //
-                SimpleRecyclerAdapter<Thread, CarBinder> adapter =
-                        new SimpleRecyclerAdapter<>(new CarBinder());
+                SimpleRecyclerAdapter<Thread, UserBinder> adapter =
+                        new SimpleRecyclerAdapter<>(new UserBinder());
 
                 mResultList.setAdapter(adapter);
                 adapter.setData(t);
@@ -185,7 +191,8 @@ public class ChatThreads extends Fragment {
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(Uri uri);
     }
-    public class CarBinder extends ItemBinder<Thread, CarBinder.CarViewHolder> {
+
+    public class UserBinder extends ItemBinder<Thread, UserBinder.UserViewHolder> {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         private DatabaseReference root = FirebaseDatabase.getInstance().getReference();
         private DatabaseReference lastMessage = FirebaseDatabase.getInstance().getReference();
@@ -195,16 +202,36 @@ public class ChatThreads extends Fragment {
         private String sender;
         private Uri profilePath;
 
-        @Override public CarViewHolder create(LayoutInflater inflater, ViewGroup parent) {
-            return new CarViewHolder(inflater.inflate(R.layout.thread_layout, parent, false));
+        @Override public UserViewHolder create(LayoutInflater inflater, ViewGroup parent) {
+            return new UserViewHolder(inflater.inflate(R.layout.thread_layout, parent, false));
         }
 
         @Override
-        public void bind(final CarViewHolder holder, final Thread item) {
+        public void bind(final UserViewHolder holder, final Thread item) {
             try {
-                holder.user_name.setText(item.getEmail());
+                Query nameQuery = mUserDatabaseRunner;
+                nameQuery.keepSynced(true);
+                nameQuery.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        for(DataSnapshot each_user: dataSnapshot.getChildren()){
+                            if(each_user.child("email").getValue().toString().equals(item.getEmail())){
+                                holder.user_name.setText(each_user.child("name").getValue().toString());
+                                item.setName(each_user.child("name").getValue().toString());
+                                item.setUid(each_user.child("uid").getValue().toString());
+                                item.setImageUrl(each_user.child("image").getValue().toString());
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
             }catch (Exception e){
-                Log.e("Raise", "No email");
+                //Log.e("Raise", "No email");
             }
             holder.profileStorageRef.child("images/"+item.getEmail()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
@@ -246,16 +273,18 @@ public class ChatThreads extends Fragment {
             holder.user_name.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    openChatActivity(item.getEmail());
+                    openChatActivity(item.getEmail(), item.getName(), item.getImageUrl(), item.getUid(), item.getThreadID());
                 }
             });
             holder.relativeLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    openChatActivity(item.getEmail());
+                    openChatActivity(item.getEmail(), item.getName(), item.getImageUrl(), item.getUid(), item.getThreadID());
                 }
             });
             Query firebaseLastMessageQuery = lastMessage.child("messages").child(item.getThreadID());
+            firebaseLastMessageQuery.keepSynced(true);
+            lastMessage.keepSynced(true);
             firebaseLastMessageQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -288,6 +317,7 @@ public class ChatThreads extends Fragment {
                 }
             });
             Query userOnlineStatusQuery = users;
+            userOnlineStatusQuery.keepSynced(true);
             userOnlineStatusQuery.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -298,7 +328,7 @@ public class ChatThreads extends Fragment {
                             }else {
                                 holder.online.setVisibility(View.GONE);
                             }
-                            Log.e("snapshot", item.getEmail());
+                            //Log.e("snapshot", item.getEmail());
                         }
                     }
                 }
@@ -316,14 +346,14 @@ public class ChatThreads extends Fragment {
         }
 
 
-        class CarViewHolder extends BaseViewHolder<Thread> {
+        class UserViewHolder extends BaseViewHolder<Thread> {
             TextView user_name;
             TextView lastMessagView;
             CircleImageView profile_image;
             ImageView online;
             StorageReference profileStorageRef;
             RelativeLayout relativeLayout;
-            public CarViewHolder(View itemView) {
+            public UserViewHolder(View itemView) {
                 super(itemView);
                 user_name = (TextView) itemView.findViewById(R.id.email_text);
                 profile_image = (CircleImageView) itemView.findViewById(R.id.profile_image);
@@ -336,81 +366,34 @@ public class ChatThreads extends Fragment {
 
             // Normal ViewHolder code
         }
-        public void openChatActivity(final String receiver_email){
+        public void openChatActivity(final String receiver_email,
+                                     final String name,
+                                     final String imageUrl,
+                                     final String uid,
+                                     final String threadID)
+        {
             final String currentUser = user.getEmail();
             final ArrayList<String> participants = new ArrayList<>();
-            Query firebaseSearchQuery = root.child("threads");
-            firebaseSearchQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+
+            Intent intent = new Intent(getContext(), ChatActivity.class);
+            intent.putExtra("threadID", threadID);
+            intent.putExtra("name", name);
+            intent.putExtra("receiver_email", receiver_email);
+            intent.putExtra("imageUrl", imageUrl);
+            intent.putExtra("uid", uid);
+            StorageReference profileStorageRef = FirebaseStorage.getInstance().getReference();
+            profileStorageRef.child("images/"+receiver_email).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    int count= 0;
-                    for(DataSnapshot snapshot: dataSnapshot.getChildren()){
-                        count++;
-                        String data = snapshot.getValue().toString();
-                        Log.e("Count", count+"");
-                        Log.e("Data", data);
+                public void onSuccess(Uri uri) {
+                    intent.putExtra("photo_url", uri);
+                    startActivity(intent);
 
-                        if(data.contains(receiver_email) && data.contains(currentUser)){
-
-                            Intent intent = new Intent(getContext(), ChatActivity.class);
-                            intent.putExtra("threadID", snapshot.getRef().getKey());
-                            intent.putExtra("receiver_email", receiver_email);
-                            StorageReference profileStorageRef = FirebaseStorage.getInstance().getReference();
-                            profileStorageRef.child("images/"+receiver_email).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                @Override
-                                public void onSuccess(Uri uri) {
-                                    intent.putExtra("photo_url", uri);
-                                    startActivity(intent);
-
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    intent.putExtra("photo_url", Uri.parse("https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png"));
-                                    startActivity(intent);
-
-                                }
-                            });
-                            break;
-                        }
-                        else if(!(data.contains(receiver_email) && data.contains(currentUser))
-                                && count == dataSnapshot.getChildrenCount()) {
-                            Log.e("In else if","let's see");
-                            Log.e("Count", count+"");
-                            ArrayList<String> members = new ArrayList<>();
-                            members.add(receiver_email);
-                            members.add(currentUser);
-                            root = root.child("threads");
-                            root.keepSynced(true);
-                            String uniqueID = UUID.randomUUID().toString();
-                            root.child(uniqueID).child("members").setValue(members);
-                            Intent intent = new Intent(getContext(), ChatActivity.class);
-                            intent.putExtra("threadID", uniqueID);
-                            intent.putExtra("receiver_email", receiver_email);
-                            StorageReference profileStorageRef = FirebaseStorage.getInstance().getReference();
-                            profileStorageRef.child("images/"+receiver_email).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                @Override
-                                public void onSuccess(Uri uri) {
-                                    intent.putExtra("photo_url", uri);
-                                    startActivity(intent);
-
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    intent.putExtra("photo_url", Uri.parse("https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png"));
-                                    startActivity(intent);
-                                }
-                            });
-                            break;
-
-                        }
-
-                    }
                 }
-
+            }).addOnFailureListener(new OnFailureListener() {
                 @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
+                public void onFailure(@NonNull Exception e) {
+                    intent.putExtra("photo_url", Uri.parse("https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png"));
+                    startActivity(intent);
 
                 }
             });

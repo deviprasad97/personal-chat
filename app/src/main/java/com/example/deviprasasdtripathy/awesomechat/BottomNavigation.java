@@ -62,6 +62,7 @@ public class BottomNavigation extends AppCompatActivity {
     Drawer drawerResult;
     AccountHeader headerResult;
     final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users");
     DatabaseReference ref;
     Uri photUri;
     String displayName;
@@ -80,7 +81,7 @@ public class BottomNavigation extends AppCompatActivity {
         BottomNavigationViewHelper.disableShiftMode(navigation);
         if (user != null) {
             // User is signed in do nothing
-            Log.e("User:", user.getEmail().toString());
+            //Log.e("User:", user.getEmail().toString());
             ref = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid());
         } else {
             // No user is signed in commence Login
@@ -90,12 +91,12 @@ public class BottomNavigation extends AppCompatActivity {
         }
 
         try {
-            Log.e("Check", user.getPhotoUrl().toString());
+            //Log.e("Check", user.getPhotoUrl().toString());
             photUri = user.getPhotoUrl();
             displayName = user.getDisplayName();
             displayEmail = user.getEmail();
         }catch (Exception e){
-            Log.e("Check", "Null Pointer Exception happened");
+            //Log.e("Check", "Null Pointer Exception happened");
             photUri = Uri.parse("https://abs.twimg.com/sticky/default_profile_images/default_profile_400x400.png");
             displayName = "No User";
             displayEmail = "No Email";
@@ -108,6 +109,13 @@ public class BottomNavigation extends AppCompatActivity {
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
         loadFragment(new ChatThreads());
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                drawerResult.openDrawer();
+            }
+        });
     }
 
     @Override
@@ -121,9 +129,12 @@ public class BottomNavigation extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if(user != null){
-            ref.child("online").setValue("false");
-        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        ref.child("online").setValue("false");
     }
 
     @Override
@@ -212,7 +223,7 @@ public class BottomNavigation extends AppCompatActivity {
                         .withIcon(R.drawable.ic_black_person_24dp);
         SecondaryDrawerItem settings = new SecondaryDrawerItem().withName("Settings").withIcon(R.drawable.ic_settings_black_24dp);
         SecondaryDrawerItem help = new SecondaryDrawerItem().withName("Help and Feedback").withIcon(R.drawable.ic_help_black_24dp);
-
+        SecondaryDrawerItem logout = new SecondaryDrawerItem().withName("Log Out").withIcon(R.drawable.ic_power_settings_real_black_24dp);
 
         //create the drawer and remember the `Drawer` result object
         drawerResult = new DrawerBuilder()
@@ -225,7 +236,8 @@ public class BottomNavigation extends AppCompatActivity {
                         new DividerDrawerItem(),
                         new DividerDrawerItem(),
                         settings,
-                        help
+                        help,
+                        logout
                 )
                 .withOnDrawerItemClickListener((view, position, drawerItem) -> {
                     // do something with the clicked item :D
@@ -237,10 +249,17 @@ public class BottomNavigation extends AppCompatActivity {
                         Intent intent = new Intent(BottomNavigation.this, ProfileEdit.class);
                         startActivity(intent);
                         finish();
+                    }else if(drawerItem.equals(logout)){
+                        userRef.child(user.getUid()).child("online").setValue("false");
+                        FirebaseAuth.getInstance().signOut();
+                        Intent intent = new Intent(BottomNavigation.this, LoginActivity.class);
+                        startActivity(intent);
+                        finish();
                     }
                     return true;
                 })
                 .build();
+
 
     }
 
@@ -251,15 +270,14 @@ public class BottomNavigation extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    //toolbar.setTitle("Home");
+                    toolbar_chat_fragment.setText("Awesome Chat");
+                    toolbar.setTitle("");
                     loadFragment(new ChatThreads());
                     return true;
                 case R.id.add_user:
-//                    fragment = new SellFragment();
-//                    loadFragment(fragment);
-                    Intent intent=new Intent(getApplicationContext(),AddUser.class);
-                    startActivity(intent);
-                    finish();
+                    toolbar_chat_fragment.setText("Add User");
+                    toolbar.setTitle("");
+                    loadFragment(new SearchUSer());
                     return true;
                 case R.id.navigation_profile:
                     //FirebaseAuth.getInstance().signOut();

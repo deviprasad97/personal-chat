@@ -11,13 +11,16 @@ import android.os.Bundle;
 import android.util.Log;
 import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
+import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -47,17 +50,20 @@ import java.util.Map;
 import co.intentservice.chatui.ChatView;
 import co.intentservice.chatui.models.ChatMessage;
 import de.hdodenhof.circleimageview.CircleImageView;
+import pl.tajchert.sample.DotsTextView;
 
 public class ChatActivity extends AppCompatActivity {
 
     private String threadID;
-    private String receiver_email;
+    private String receiver_email, receiver_name, imageUrl;
     private String chat_msg,chat_user_name, type;
     private String currparticipant;
     private long time;
 
     private DatabaseReference root = FirebaseDatabase.getInstance().getReference();
     private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    private DatabaseReference threadRef = FirebaseDatabase.getInstance().getReference().child("threads");
+    private DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users");
     private DatabaseReference notifications = FirebaseDatabase.getInstance().getReference().child("notifications");
     private StorageReference mImageStorage;
     private String temp_key;
@@ -67,6 +73,9 @@ public class ChatActivity extends AppCompatActivity {
     private ImageButton imageMessage;
     private ImageView imageMessageView;
     private ListView chat_list;
+    private TextView block_message;
+    private Button block_button;
+    private TextView dotsTextView;
     private final int PICK_IMAGE_REQUEST = 71;
 
     private String user_name;
@@ -81,33 +90,111 @@ public class ChatActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.chat_view_toolbar);
         imageMessage = findViewById(R.id.pic_message);
         chat_list = findViewById(R.id.chat_list);
+        block_button = findViewById(R.id.block_button);
+        block_button.setVisibility(View.GONE);
+        block_message = findViewById(R.id.block_message);
+        block_button.setVisibility(View.GONE);
         imageMessageView = findViewById(R.id.image_message_view);
+        dotsTextView = findViewById(R.id.typing);
         toolbar_profile_icon = (CircleImageView) findViewById(R.id.toolbar_profile_icon);
         mImageStorage = FirebaseStorage.getInstance().getReference();
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.ic_arrow_back_black_24dp);
+        toolbar.inflateMenu(R.menu.menu_profile);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onBackPressed();
             }
         });
-
+        userRef.child(user.getUid()).child("online").setValue("true");
         threadID = getIntent().getExtras().get("threadID").toString();
+        try{
+            receiver_name = getIntent().getExtras().get("name").toString();
+        }catch (Exception e){
+            receiver_name = getIntent().getExtras().get("receiver_email").toString();
+        }
+        imageUrl = getIntent().getExtras().get("photo_url").toString();
         receiver_email = getIntent().getExtras().get("receiver_email").toString();
+        threadRef.child(threadID).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot ds : dataSnapshot.getChildren()){
+                    Log.e("threadRefDS", ds.getValue().toString());
+                    String user1 = user.getEmail().replace(".", "");
+                    String user2 = receiver_email.replace(".","");
+                    String gotUser = ds.getKey();
+                    if(gotUser.equals(user1)){
+                        if(ds.getValue().toString().equals("false")){
+                            block_message.setVisibility(View.VISIBLE);
+                            block_message.setText("You cannot message this user");
+                            block_button.setText("Unblock");
+                            block_button.setVisibility(View.VISIBLE);
+                            chatView.setVisibility(View.GONE);
+                        }else {
+                            block_message.setVisibility(View.GONE);
+                            block_button.setVisibility(View.GONE);
+                            chatView.setVisibility(View.VISIBLE);
+                        }
+                    }else if(gotUser.equals(user2)){
+                        if(ds.getValue().toString().equals("false")){
+                            block_button.setVisibility(View.GONE);
+                            block_message.setVisibility(View.VISIBLE);
+                            block_message.setText("You cannot message this user");
+                            chatView.setVisibility(View.GONE);
+                        }else {
+                            block_button.setVisibility(View.GONE);
+                            chatView.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }
+                Log.e("threadRef", dataSnapshot.getValue().toString());
+                //String user1 = dataSnapshot.child(user.getEmail().replace(".","")).getValue().toString();
+                /*String user2 = dataSnapshot.child(receiver_email.replace(".","")).getValue().toString();
+                if(user2.equals("false")){
+                    block_message.setVisibility(View.VISIBLE);
+                    block_message.setText("You cannot message this user");
+                    block_button.setText("Unblock");
+                    block_button.setVisibility(View.VISIBLE);
+                    chatView.setVisibility(View.INVISIBLE);
+                }
+                else if(user2.equals("false")){
+                    block_button.setVisibility(View.GONE);
+                    block_message.setVisibility(View.VISIBLE);
+                    block_message.setText("You cannot message this user");
+                    chatView.setVisibility(View.GONE);
+                }*/
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
         try {
             uri = Uri.parse(getIntent().getExtras().get("photo_url").toString());
 
         }catch (Exception e){
             Log.e("photo_url", "not supplied");
         }
-        setTitle(receiver_email);
+        setTitle(receiver_name);
         Picasso.get().load(uri).into(toolbar_profile_icon);
         root = FirebaseDatabase.getInstance().getReference().child("messages").child(threadID);
         root.keepSynced(true);
         user_name = user.getEmail();
-        Log.e("threadID", threadID);
+        //Log.e("threadID", threadID);
         chatView = (ChatView) findViewById(R.id.chat_view);
+        chatView.setTypingListener(new ChatView.TypingListener() {
+            @Override
+            public void userStartedTyping() {
+                dotsTextView.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void userStoppedTyping() {
+                dotsTextView.setVisibility(View.GONE);
+            }
+        });
         imageMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -127,6 +214,14 @@ public class ChatActivity extends AppCompatActivity {
             @Override
             public void userStoppedTyping() {
 
+            }
+        });
+        block_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                threadRef.child(threadID).child(user.getEmail().replace(".", "")).setValue("true");
+                finish();
+                startActivity(getIntent());
             }
         });
         chatView.setOnSentMessageListener(new ChatView.OnSentMessageListener() {
@@ -182,11 +277,47 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_chat, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_block) {
+            threadRef.child(threadID).child(user.getEmail().replace(".", "")).setValue("false");
+            finish();
+            startActivity(getIntent());
+            return true;
+        }
+        else if(id == R.id.view_profile){
+            Intent intent = new Intent(ChatActivity.this, ProfileView.class);
+            intent.putExtra("name", receiver_name);
+            intent.putExtra("email", receiver_email);
+            intent.putExtra("photo_url", imageUrl);
+            intent.putExtra("thread", threadID);
+            startActivity(intent);
+            finish();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+    @Override
     protected void onStop() {
         super.onStop();
         messageKey.clear();
-    }
 
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        userRef.child(user.getUid()).child("online").setValue("false");
+    }
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
@@ -205,13 +336,13 @@ public class ChatActivity extends AppCompatActivity {
                 .child(threadID).child(messageKey.get(position));
         switch (item.getItemId()){
             case R.id.chat_delete:
-                Log.e("Delete", "Selected" + messageKey.get(position));
+                //Log.e("Delete", "Selected" + messageKey.get(position));
 
-                Log.e("Delete", "Selected "+position);
+                //Log.e("Delete", "Selected "+position);
                 deleteRef.child("-"+user.getEmail().replace(".","")).setValue("false");
                 chatView.removeMessage(position);
                 messageKey.remove(position);
-                Log.e("After Delete", messageKey.toString() + " Size " + messageKey.size());
+                //Log.e("After Delete", messageKey.toString() + " Size " + messageKey.size());
 
                 return true;
             default:
@@ -224,7 +355,7 @@ public class ChatActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK){
             Uri uri = data.getData();
-            Log.e("Image Uri", uri.toString());
+            //Log.e("Image Uri", uri.toString());
             temp_key = root.push().getKey();
             StorageReference filepath = mImageStorage.child("image_messages").child( temp_key + ".jpg");
             filepath.putFile(uri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
@@ -236,7 +367,7 @@ public class ChatActivity extends AppCompatActivity {
                             @Override
                             public void onSuccess(Uri uri) {
                                 String download = uri.toString();
-                                Log.e("Uri", download);
+                                //Log.e("Uri", download);
                                 Map<String,Object> map = new HashMap<String, Object>();
                                 root.updateChildren(map);
                                 Date date = new Date();
@@ -263,7 +394,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private void append_chat_conversation(DataSnapshot dataSnapshot) {
         String key = dataSnapshot.getKey();
-        Log.e("message key->", messageKey.toString());
+        //Log.e("message key->", messageKey.toString());
         Iterator i = dataSnapshot.getChildren().iterator();
         while (i.hasNext()){
             DataSnapshot part1, part2;
@@ -288,7 +419,7 @@ public class ChatActivity extends AppCompatActivity {
                     + "\n\taccess: "+ access
                     +"\n}";
 
-            Log.e("Data", data);
+            //Log.e("Data", data);
 
             //chat_conversation.append(chat_user_name +" : "+chat_msg +" \n");
             if(type.equals("text")){
@@ -306,7 +437,7 @@ public class ChatActivity extends AppCompatActivity {
             }
             else if(type.equals("image")){
                 Uri imageMessage = Uri.parse(chat_msg);
-                Log.e("Chat Image", chat_msg);
+                //Log.e("Chat Image", chat_msg);
                 if(access.equals("true")) {
                     messageKey.add(key);
                     if (user_name.equals(chat_user_name)) {

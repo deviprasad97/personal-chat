@@ -6,7 +6,7 @@ import java.util.List;
 
 public class Thread {
 
-    public String name, email, uid, threadID;
+    public String name, email, uid, threadID, imageUrl;
 
 
     public String getName() {
@@ -19,6 +19,14 @@ public class Thread {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public String getThreadID() {

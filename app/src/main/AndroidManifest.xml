@@ -22,6 +22,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         android:name=".AwesomeChat">
+
+        <service
+            android:name=".MyService"
+            android:stopWithTask="false" />
+
         <activity android:name=".BottomNavigation">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -36,7 +41,8 @@
         <activity android:name=".LoginActivity" />
         <activity android:name=".ProfileActivity" />
         <activity android:name=".ChatActivity" />
-        <activity android:name=".ProfileEdit"></activity>
+        <activity android:name=".ProfileView"/>
+        <activity android:name=".ProfileEdit"/>
     </application>
 
 </manifest>

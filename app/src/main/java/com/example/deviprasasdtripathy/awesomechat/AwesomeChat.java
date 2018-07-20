@@ -36,4 +36,10 @@ public class AwesomeChat extends Application{
         });
 
     }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        ref.child(user.getUid()).child("online").setValue("false");
+    }
 }
